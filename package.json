@@ -1,0 +1,54 @@
+{
+  "name": "aca-cli",
+  "version": "0.1.0",
+  "description": "Command-line interface for ACA (Automated Client Acquisition) — push leads to campaigns, triage replies, manage contacts, all from your terminal.",
+  "type": "module",
+  "bin": {
+    "aca": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "aca",
+    "cli",
+    "outreach",
+    "sales",
+    "automation",
+    "linkedin",
+    "email"
+  ],
+  "author": "Cedric Seguela <cedric@growth-consulting.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seguelaCedric/aca-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seguelaCedric/aca-cli/issues"
+  },
+  "homepage": "https://github.com/seguelaCedric/aca-cli#readme",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}
