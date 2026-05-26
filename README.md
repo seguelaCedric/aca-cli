@@ -13,18 +13,24 @@ Requires Node.js 18 or later.
 ## Quick start
 
 ```bash
-# 1. Log in (same credentials as the app)
-aca login
+# 1. Generate a token at app.aca.io → Settings → CLI Tokens
+#    (Required for Google sign-in users; recommended for everyone.)
+aca login --token aca_<paste-token-here>
 
-# 2. Pick an organization (skip if you only belong to one)
-aca org ls
-aca org switch <organizationId>
-
-# 3. Use it
+# 2. Use it
 aca leads search --tag warm --has-email
 aca enroll -c <campaignId> --contacts <id1,id2>
 aca inbox unread --channel linkedin
 ```
+
+**Legacy email/password login** is still supported for accounts that have a password set:
+
+```bash
+aca login              # prompts for email + password
+aca login -e you@example.com -p <password>
+```
+
+If your account uses Google sign-in, email/password login won't work — generate a token instead.
 
 Pass `--json` to any command for pipe-friendly output:
 
@@ -37,9 +43,10 @@ aca campaign leads <campaignId> --stuck --json | jq '.[] | .contact_id'
 ### Auth
 | Command | What it does |
 |---|---|
-| `aca login` | Email + password login. Caches a JWT at `~/.aca/session.json` (auto-refreshing). |
+| `aca login --token <value>` | **Recommended.** Save an API token from app.aca.io. Works for any account (Google, SSO, password). Token is long-lived; revoke at any time in the app. |
+| `aca login` | Email + password login (legacy). Auto-refreshing JWT. Doesn't work for Google sign-in users. |
 | `aca logout` | Clears the cached session. |
-| `aca whoami` | Shows the currently logged-in user. |
+| `aca whoami` | Shows the active auth method (token vs JWT). |
 
 ### Organization
 | Command | What it does |
@@ -135,8 +142,9 @@ aca config set update_check_enabled false
 
 | Variable | Purpose |
 |---|---|
-| `ACA_EMAIL` | Skip the email prompt during `aca login` |
-| `ACA_PASSWORD` | Skip the password prompt during `aca login` (use with care in shared shells) |
+| `ACA_TOKEN` | Skip `--token` flag. CLI uses this for auth on every command. Useful for CI. |
+| `ACA_EMAIL` | Skip the email prompt during legacy `aca login` |
+| `ACA_PASSWORD` | Skip the password prompt during legacy `aca login` (use with care in shared shells) |
 
 ## Development
 

@@ -1,6 +1,6 @@
 {
   "name": "@seguelac/aca-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Command-line interface for ACA (Automated Client Acquisition) — push leads to campaigns, triage replies, manage contacts, all from your terminal.",
   "type": "module",
   "bin": {
