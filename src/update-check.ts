@@ -65,6 +65,6 @@ export async function maybeCheckForUpdate(currentVersion: string): Promise<void>
 
 function notify(current: string, latest: string): void {
   process.stderr.write(
-    `\n→ aca-cli ${latest} is available (you have ${current}). Run \`npm i -g aca-cli\` to update.\n   Disable with \`aca config set update_check_enabled false\`.\n\n`,
+    `\n→ aca-cli ${latest} is available (you have ${current}). Run \`npm i -g @seguelac/aca-cli\` to update.\n   Disable with \`aca config set update_check_enabled false\`.\n\n`,
   );
 }

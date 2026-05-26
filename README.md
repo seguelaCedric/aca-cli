@@ -5,7 +5,7 @@ Command-line interface for [ACA](https://app.aca.io) (Automated Client Acquisiti
 ## Install
 
 ```bash
-npm install -g aca-cli
+npm install -g @seguelac/aca-cli
 ```
 
 Requires Node.js 18 or later.

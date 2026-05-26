@@ -8,5 +8,5 @@ export const SESSION_FILE = 'session.json';
 export const CONFIG_FILE = 'config.json';
 export const UPDATE_CHECK_FILE = 'update-check.json';
 
-export const NPM_REGISTRY_URL = 'https://registry.npmjs.org/aca-cli/latest';
+export const NPM_REGISTRY_URL = 'https://registry.npmjs.org/@seguelac/aca-cli/latest';
 export const UPDATE_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24h
