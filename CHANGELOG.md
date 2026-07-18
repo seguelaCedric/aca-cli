@@ -2,6 +2,15 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.4.0] - 2026-07-18
+
+### Added
+- **`aca contact bulk-create`**: create many CRM contacts from a CSV/JSON file (`--file`) or piped stdin. Splits large inputs into batched requests (`--batch-size`, max 1000), dedups on email by default (`--no-dedupe` to override), supports `--source`, `--no-activity`, and `--dry-run`. CSV tags go in one cell separated by `;`.
+- Backed by a new `bulk-create-contacts` edge function (also usable directly as a REST API) and a matching `bulk_create_contacts` MCP tool — all three share one core so behavior is identical across surfaces.
+
+### Changed
+- Reconciled the version number: the built binary reported `0.3.0` while `package.json` was `0.2.0`. Both are now `0.4.0`.
+
 ## [0.2.0] - 2026-05-26
 
 ### Added
