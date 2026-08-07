@@ -83,6 +83,13 @@ aca campaign leads <campaignId> --stuck --json | jq '.[] | .contact_id'
 | `aca campaign status <id>` | Aggregate progress counts (pending, replied, failed, etc.). |
 | `aca campaign leads <id> --stuck` | List stuck leads (status: failed or sender_disconnected). |
 
+### Email sequences
+| Command | What it does |
+|---|---|
+| `aca sequence duplicate <id>` | Copy a sequence (steps, settings, mailbox pool, tracking domain). Always lands as a **draft**. |
+| `aca sequence duplicate <id> --with-lists` | ...and attach the same lead lists (auto-enroll + enrollment filter travel with them). |
+| `aca sequence duplicate <id> --with-leads` | ...and re-enrol the leads currently in the source. Unsubscribed/bounced leads, and leads already active in another sequence, are skipped and reported. Pages through the source, so a large audience takes a few minutes. |
+
 ### Contacts
 | Command | What it does |
 |---|---|

@@ -2,6 +2,17 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.5.0] - 2026-08-07
+
+### Added
+- **`aca sequence duplicate <id>`**: copy an email sequence — steps, settings, mailbox pool, tracking domain and enrollment filter — optionally with its audience. `--with-lists` attaches the same lead lists (and their auto-enroll setup); `--with-leads` re-enrols the leads currently in the source. `--name` overrides the default `"<source> (copy)"`.
+  - The copy is always created as a **draft**, so duplicating never starts sending.
+  - `--with-leads` runs the full enrollment path, so unsubscribed/bounced leads and leads already active in another sequence are skipped — the command reports each bucket. It pages the source (1000 leads per request) and prints progress; ~15s per page, so a 13k-lead sequence takes a few minutes. Every page is durable, so interrupting it leaves correct data behind.
+- Backed by a new `duplicate-email-sequence` edge function and a `sourceSequenceId` mode on `enroll-leads`, both shared with the app UI and the `duplicate_email_sequence` MCP tool.
+
+### Note
+There is intentionally no `aca sequence ls` — listing goes through PostgREST, which only accepts JWTs, not the `aca_` API tokens this CLI recommends.
+
 ## [0.4.0] - 2026-07-18
 
 ### Added

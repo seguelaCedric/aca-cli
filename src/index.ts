@@ -8,6 +8,7 @@ import { registerLeads } from './commands/leads.js';
 import { registerInbox } from './commands/inbox.js';
 import { registerReply } from './commands/reply.js';
 import { registerCampaign } from './commands/campaign.js';
+import { registerSequence } from './commands/sequence.js';
 import { registerContact } from './commands/contact.js';
 import { registerSignals } from './commands/signals.js';
 import { registerAutopilot } from './commands/autopilot.js';
@@ -15,7 +16,7 @@ import { registerConfig } from './commands/config.js';
 import { registerCompletion } from './commands/completion.js';
 import { maybeCheckForUpdate } from './update-check.js';
 
-const VERSION = '0.4.0';
+const VERSION = '0.5.0';
 
 const program = new Command();
 program
@@ -31,6 +32,7 @@ registerLeads(program);
 registerInbox(program);
 registerReply(program);
 registerCampaign(program);
+registerSequence(program);
 registerContact(program);
 registerSignals(program);
 registerAutopilot(program);
