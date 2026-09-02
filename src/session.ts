@@ -7,7 +7,19 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './constants.js';
  *
  *   - api_token (preferred, since v0.2.0): a long-lived `aca_<43 chars>` token
  *     issued from app.aca.io → Settings → CLI Tokens. No refresh. Works for
- *     any user including Google sign-in. The token IS the access token.
+ *     any user including Google sign-in.
+ *
+ *     The token itself is never sent to PostgREST or edge functions directly
+ *     for /rest/v1/* calls — PostgREST's own JWT verification rejects any
+ *     Authorization bearer that isn't a signed 3-part JWT, regardless of
+ *     what the request's RLS policies would otherwise allow. Instead
+ *     `getAccessToken()` exchanges it (via the `cli-token-exchange` edge
+ *     function) for a short-lived real Supabase session and caches that
+ *     under `derived_access_token` until it's close to expiry, at which
+ *     point it transparently re-exchanges. Edge functions that already
+ *     accept `aca_` tokens directly (via `_shared/cli-auth.ts`) are happy to
+ *     receive the derived JWT instead, so callers don't need to care which
+ *     kind of token is in play.
  *
  *   - jwt (legacy, v0.1.x): a Supabase JWT obtained via password grant.
  *     Auto-refreshes via refresh_token. Only works for email/password accounts.
@@ -22,6 +34,10 @@ export interface Session {
   expires_at?: number;
   user_id?: string;
   email?: string;
+  // Cache for the api_token path: a real session JWT exchanged from
+  // access_token, plus when it stops being safe to reuse.
+  derived_access_token?: string;
+  derived_expires_at?: number;
 }
 
 export function readSession(): Session | null {
@@ -135,8 +151,33 @@ async function refreshJwt(session: Session): Promise<Session> {
 }
 
 /**
- * Returns the current access token, refreshing the JWT if needed. API tokens
- * are long-lived and never refreshed.
+ * Exchange a long-lived `aca_` token for a short-lived real Supabase session
+ * via the cli-token-exchange edge function. See the Session doc comment for
+ * why this indirection exists.
+ */
+async function exchangeApiToken(apiToken: string): Promise<{ access_token: string; expires_in: number }> {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/cli-token-exchange`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${apiToken}` },
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Token exchange failed (${res.status}): ${body}`);
+  }
+  const data = (await res.json()) as { access_token?: string; expires_in?: number };
+  if (!data.access_token) {
+    throw new Error('Token exchange returned no access token');
+  }
+  return { access_token: data.access_token, expires_in: data.expires_in ?? 3600 };
+}
+
+/**
+ * Returns the current access token, refreshing/re-exchanging as needed.
+ *
+ * - api_token: exchanged for a real session JWT, cached until it's within a
+ *   minute of expiry, then transparently re-exchanged from the same `aca_`
+ *   token (which itself never expires from the CLI's perspective).
+ * - jwt: refreshed via its own refresh_token when close to expiry.
  */
 export async function getAccessToken(): Promise<string> {
   const session = readSession();
@@ -144,7 +185,17 @@ export async function getAccessToken(): Promise<string> {
     throw new Error('Not logged in. Run `aca login` first.');
   }
   if (session.auth_method === 'api_token') {
-    return session.access_token;
+    const now = Math.floor(Date.now() / 1000);
+    if (session.derived_access_token && session.derived_expires_at && session.derived_expires_at - now > 60) {
+      return session.derived_access_token;
+    }
+    const derived = await exchangeApiToken(session.access_token);
+    writeSession({
+      ...session,
+      derived_access_token: derived.access_token,
+      derived_expires_at: Math.floor(Date.now() / 1000) + derived.expires_in,
+    });
+    return derived.access_token;
   }
   // JWT path
   const now = Math.floor(Date.now() / 1000);

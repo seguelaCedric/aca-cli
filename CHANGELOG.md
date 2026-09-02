@@ -2,6 +2,13 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.6.0] - 2026-09-02
+
+### Fixed
+- **API token auth was broken for every command that reads via PostgREST** (`org ls/switch/current`, `inbox`, `contact get`, `campaign`, `autopilot`, `leads`, `lists`, `signals`, `reply` lookups): `aca login --token` sent the raw `aca_` token straight to `/rest/v1/*`, which PostgREST rejects outright (`Expected 3 parts in JWT; got 1`) since it isn't a signed JWT — this affected every Google sign-in user, i.e. the CLI's own recommended login path.
+  - `getAccessToken()` now exchanges the `aca_` token for a short-lived real Supabase session via a new `cli-token-exchange` edge function, and caches it until it's near expiry. Everything downstream (PostgREST and edge-function calls alike) now gets a token it actually accepts.
+  - The 0.5.0 note that `aca sequence ls` couldn't exist because "listing goes through PostgREST, which only accepts JWTs" no longer applies — that limitation is what this fixes.
+
 ## [0.5.0] - 2026-08-07
 
 ### Added
@@ -11,7 +18,7 @@ All notable changes to `aca-cli` are documented here. Format loosely follows [Ke
 - Backed by a new `duplicate-email-sequence` edge function and a `sourceSequenceId` mode on `enroll-leads`, both shared with the app UI and the `duplicate_email_sequence` MCP tool.
 
 ### Note
-There is intentionally no `aca sequence ls` — listing goes through PostgREST, which only accepts JWTs, not the `aca_` API tokens this CLI recommends.
+There was intentionally no `aca sequence ls` — listing went through PostgREST, which only accepted JWTs, not the `aca_` API tokens this CLI recommends. Fixed in 0.6.0.
 
 ## [0.4.0] - 2026-07-18
 
