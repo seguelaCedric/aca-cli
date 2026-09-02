@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { Command } from 'commander';
 import { registerAuth } from './commands/auth.js';
 import { registerOrg } from './commands/org.js';
@@ -16,7 +19,11 @@ import { registerConfig } from './commands/config.js';
 import { registerCompletion } from './commands/completion.js';
 import { maybeCheckForUpdate } from './update-check.js';
 
-const VERSION = '0.5.0';
+// Read from package.json rather than hardcoding — a hardcoded copy has
+// drifted from the real version at least once before (see CHANGELOG 0.4.0).
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf8')) as { version: string };
+const VERSION = pkg.version;
 
 const program = new Command();
 program

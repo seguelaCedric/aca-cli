@@ -2,6 +2,11 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.6.1] - 2026-09-02
+
+### Fixed
+- `aca --version` reported `0.5.0` on the 0.6.0 build — a `VERSION` constant hardcoded in `index.ts` had drifted from `package.json` (the same class of bug called out in 0.4.0's changelog). Now read from `package.json` at runtime so the two can't diverge again.
+
 ## [0.6.0] - 2026-09-02
 
 ### Fixed
