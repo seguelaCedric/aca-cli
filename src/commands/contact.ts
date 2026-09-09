@@ -16,6 +16,8 @@ const CONTACT_FIELDS = [
   'primary_email',
   'primary_phone',
   'primary_linkedin_url',
+  'linkedin_bio',
+  'home_page_text',
   'company_website',
   'city',
   'state',

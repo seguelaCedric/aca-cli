@@ -2,6 +2,11 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.6.2] - 2026-09-09
+
+### Added
+- `linkedin_bio` and `home_page_text` are now standard contact fields (promoted from an org-scoped custom field / newly added, respectively — same underlying `crm_contacts` columns the app and MCP use). `aca contact bulk-create` accepts both; `aca contact get` already returns them since it reads the full `/v1/contacts/{id}` shape.
+
 ## [0.6.1] - 2026-09-02
 
 ### Fixed
