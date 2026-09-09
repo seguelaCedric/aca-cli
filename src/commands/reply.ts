@@ -20,6 +20,7 @@ export function registerReply(program: Command): void {
     .description('Reply to an existing CRM conversation')
     .argument('<conversationId>')
     .option('-m, --message <text>', 'Reply body (or pipe via stdin)')
+    .option('--html', 'Send --message/stdin as raw HTML instead of plain text (email channels only) — e.g. an <a href><img></a> snippet to embed a linked thumbnail like a Loom video preview')
     .option('--subject <text>', 'Email subject (email channels only)')
     .option('--cc <emails>', 'Comma-separated CC list (email only)')
     .option('--bcc <emails>', 'Comma-separated BCC list (email only)')
@@ -29,6 +30,7 @@ export function registerReply(program: Command): void {
         conversationId: string,
         opts: {
           message?: string;
+          html?: boolean;
           subject?: string;
           cc?: string;
           bcc?: string;
@@ -48,12 +50,17 @@ export function registerReply(program: Command): void {
           fail('Conversation is missing external_participant_id — cannot determine recipient.');
         }
 
+        if (opts.html && conv.channel !== 'email' && !conv.mailbox_id) {
+          fail('--html is only meaningful for email conversations — other channels send it as literal text.');
+        }
+
         const body: Record<string, unknown> = {
           conversation_id: conv.id,
           contact_id: conv.contact_id,
           channel: conv.channel,
           recipient_external_id: conv.external_participant_id,
           content,
+          content_type: opts.html ? 'html' : 'text',
         };
         if (conv.channel_account_id) body.channel_account_id = conv.channel_account_id;
         if (conv.external_conversation_id) body.external_conversation_id = conv.external_conversation_id;
