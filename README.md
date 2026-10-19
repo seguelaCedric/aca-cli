@@ -65,8 +65,8 @@ aca campaign leads <campaignId> --stuck --json | jq '.[] | .contact_id'
 | `aca lists add -l <listId> --contacts <ids>` | Bulk-add contacts to a list. |
 | `aca lists members -l <listId>` | List members of a list. |
 | `aca lists remove -l <listId> --contacts <ids>` | Remove contacts from a list. |
-| `aca enroll -c <campaignId> -l <listId>` | Enroll an entire list into a campaign. |
-| `aca enroll -c <campaignId> --contacts <ids>` | Enroll specific contacts. |
+| `aca enroll -c <campaignId> -l <listId>` | Enroll an entire list (or several, comma-separated) as a background job and follow its progress. `--no-wait` returns the job id. |
+| `aca enroll -c <campaignId> --contacts <ids>` | Enroll specific contacts (or pipe ids on stdin). Over 2,500 ids runs as a background job. |
 
 ### Inbox & replies
 | Command | What it does |

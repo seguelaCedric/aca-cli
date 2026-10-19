@@ -2,6 +2,17 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.7.0] - 2026-10-19
+
+### Changed
+- **`aca enroll -l` runs as a server-side background job.** Sending a whole list in one request died past ~50k members (the platform kills a request at 150s). The CLI now starts an enrollment job and follows it, printing progress (a 193k list takes about 4 minutes). Ctrl-C stops watching, not the job. The final output adds a breakdown of skips: already enrolled, active in another sequence, suppressed, no email.
+- `--contacts` with more than 2,500 ids uses the same background job. Smaller batches still enroll synchronously and return counts straight away.
+
+### Added
+- `-l` takes several comma-separated lists (enrolls their union).
+- `--no-wait` starts the job and prints its id without following it.
+- Contact ids can be piped on stdin (comma- or whitespace-separated) when neither `-l` nor `--contacts` is given.
+
 ## [0.6.2] - 2026-09-09
 
 ### Added
