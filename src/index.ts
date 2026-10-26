@@ -15,6 +15,7 @@ import { registerSequence } from './commands/sequence.js';
 import { registerContact } from './commands/contact.js';
 import { registerSignals } from './commands/signals.js';
 import { registerAutopilot } from './commands/autopilot.js';
+import { registerMessaging } from './commands/messaging.js';
 import { registerConfig } from './commands/config.js';
 import { registerCompletion } from './commands/completion.js';
 import { maybeCheckForUpdate } from './update-check.js';
@@ -43,6 +44,7 @@ registerSequence(program);
 registerContact(program);
 registerSignals(program);
 registerAutopilot(program);
+registerMessaging(program);
 registerConfig(program);
 registerCompletion(program);
 
