@@ -39,17 +39,29 @@ function buildDbrSequence(opts: {
   lastSms: string;
   daysAfterWhatsApp: number;
   daysBetweenSms: number;
+  agentId?: string;
 }) {
   const steps: { id: string; type: string; data: Record<string, unknown> }[] = [{ id: 'start', type: 'start', data: {} }];
+  // Agent on right after each send: a reply stops the campaign, so a later handoff never runs
+  const handoff = (id: string, channel: string) => {
+    if (!opts.agentId) return;
+    steps.push({
+      id,
+      type: 'handoffToAgent',
+      data: { agentProfileId: opts.agentId, exitAfterHandoff: false, channel, continueOnFailure: true },
+    });
+  };
   if (opts.templateId) {
     steps.push({
       id: 'dbr-whatsapp',
       type: 'whatsappTemplate',
       data: { templateId: opts.templateId, templateName: opts.templateName, continueOnFailure: true },
     });
+    handoff('dbr-ai-whatsapp', 'whatsapp');
     steps.push({ id: 'dbr-wait-1', type: 'delay', data: { days: opts.daysAfterWhatsApp, hours: 0, minutes: 0 } });
   }
   steps.push({ id: 'dbr-sms-1', type: 'smsMessage', data: { message: opts.firstSms, messageVariations: [] } });
+  handoff('dbr-ai-sms', 'sms');
   steps.push({ id: 'dbr-wait-2', type: 'delay', data: { days: opts.daysBetweenSms, hours: 0, minutes: 0 } });
   steps.push({ id: 'dbr-sms-2', type: 'smsMessage', data: { message: opts.lastSms, messageVariations: [] } });
   steps.push({ id: 'dbr-end', type: 'end', data: {} });
@@ -136,6 +148,7 @@ export function registerMessaging(program: Command): void {
     .option('--last-sms <text>', 'Last nudge', DBR_LAST_SMS)
     .option('--days-after-whatsapp <n>', 'Days between the WhatsApp template and the first SMS', '2')
     .option('--days-between-sms <n>', 'Days between the two SMS', '3')
+    .option('--agent <agentProfileId>', 'AI agent that answers replies (omit to answer from the inbox)')
     .option('-o, --organization <orgId>', 'Override active organization')
     .option('--json', 'Emit JSON')
     .action(
@@ -147,6 +160,7 @@ export function registerMessaging(program: Command): void {
         lastSms: string;
         daysAfterWhatsapp: string;
         daysBetweenSms: string;
+        agent?: string;
         organization?: string;
         json?: boolean;
       }) => {
@@ -169,6 +183,7 @@ export function registerMessaging(program: Command): void {
           lastSms: opts.lastSms,
           daysAfterWhatsApp: Number(opts.daysAfterWhatsapp) || 2,
           daysBetweenSms: Number(opts.daysBetweenSms) || 3,
+          agentId: opts.agent,
         });
         const created = await restPost<{ id: string; name: string; status: string }[]>(
           'linkedin_campaigns?select=id,name,status',
@@ -181,6 +196,7 @@ export function registerMessaging(program: Command): void {
             sequence_nodes: nodes,
             sequence_edges: edges,
             stop_on_reply: true,
+            agent_profile_id: opts.agent ?? null,
             campaign_type: 'sms_whatsapp',
             primary_channel: 'sms',
           },
