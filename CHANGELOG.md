@@ -2,6 +2,12 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.8.0] - 2026-11-04
+
+### Added
+- **`aca scheduler` (alias `aca posts`): the Social Scheduler from the terminal.** `accounts`, `ls`, `show`, `create`, `edit`, `rm`, `approve`, `publish`, `retry`, `stats`, `plan` and `connect`, backed by the `api-scheduler` edge function (the same operations as `/v1/scheduler` and the ACA MCP tools). A post that would fail on a platform is refused with the reason unless saved as a draft.
+- `fnRequest()` in `api.ts`: any method against an edge function, with query parameters, unwrapping `{ success, data }`.
+
 ## [0.7.0] - 2026-10-19
 
 ### Changed

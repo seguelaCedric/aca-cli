@@ -33,6 +33,7 @@ describe('CLI help', () => {
       'campaign',
       'contact',
       'autopilot',
+      'scheduler',
       'config',
       'completion',
     ]) {

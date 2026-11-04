@@ -94,3 +94,37 @@ export async function invokeFn<T = unknown>(name: string, body?: unknown): Promi
   }
   return parsed as T;
 }
+
+/**
+ * Any method against an edge function, with query parameters: the REST resources
+ * (api-scheduler…) route on ?resource=&id=&action= and answer { success, data } or
+ * { success: false, error }. Returns `data`.
+ */
+export async function fnRequest<T = unknown>(
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  name: string,
+  params: Record<string, string | number | boolean | undefined> = {},
+  body?: unknown,
+): Promise<T> {
+  const headers = await authHeaders();
+  const query = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== '') query.set(k, String(v));
+  const qs = query.toString();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}${qs ? `?${qs}` : ''}`, {
+    method,
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const text = await res.text();
+  let parsed: { success?: boolean; data?: unknown; error?: string } | null;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    parsed = { error: text };
+  }
+  if (!res.ok || parsed?.success === false) {
+    // A refused post already names its issues in `error`.
+    throw new Error(parsed?.error || `${name} -> ${res.status}`);
+  }
+  return (parsed?.data ?? parsed) as T;
+}

@@ -105,6 +105,24 @@ aca campaign leads <campaignId> --stuck --json | jq '.[] | .contact_id'
 | `aca autopilot pause <conversationId> --hours 48` | Pause AI on a conversation. |
 | `aca autopilot resume <conversationId>` | Re-enable AI. |
 
+### Social Scheduler
+Schedule, approve and track posts on every channel (Instagram, Facebook, TikTok, YouTube, Google Business, Threads, Pinterest and X through your Zernio key; LinkedIn; GHL). `aca posts` is an alias.
+
+| Command | What it does |
+|---|---|
+| `aca scheduler accounts` | Accounts you can post to, with the ids the other commands take. |
+| `aca scheduler ls --status scheduled,failed` | The calendar (default: last 7 days and next 30). `--from`, `--to`, `--platform`. |
+| `aca scheduler show <id>` | One post: captions, destinations, errors, stats. |
+| `aca scheduler create --accounts <ids> --caption "…" --image <url> --at 2026-11-10T09:00+01:00` | Schedule a post. `--now`, `--draft`, `--for twitter="short version"`, `--video`, `--first-comment`, `--story`. The caption can be piped in. |
+| `aca scheduler edit <id> --at <datetime>` | Reschedule or edit until it goes out (same flags; `--accounts` replaces them). |
+| `aca scheduler approve <ids…>` | Drafts and agent proposals go out at their time. |
+| `aca scheduler publish <id>` / `retry <id>` / `rm <id>` | Publish now, retry a failure, remove. |
+| `aca scheduler stats <id> --refresh` | Reach, likes, comments, engagement of a published post. |
+| `aca scheduler plan "5 LinkedIn posts next week about X"` | The scheduling agent drafts posts into the best free slots. |
+| `aca scheduler connect instagram` | A sign-in link to connect an account through Zernio. |
+
+A post that would fail on a platform (Instagram with no picture, X over 280 characters) is refused with the reason, unless you save it with `--draft`.
+
 ### Config & completion
 | Command | What it does |
 |---|---|
