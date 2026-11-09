@@ -2,6 +2,11 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.8.1] - 2026-11-09
+
+### Fixed
+- **`aca inbox show` failed on every conversation** with `column crm_messages.sent_at does not exist`. It asked for `sent_at`, `received_at` and `sender_external_id`, which `crm_messages` doesn't have. It now reads `direction`, `sender_type`, `content`, `status`, `created_at`, `delivered_at` and `read_at`, newest last.
+
 ## [0.8.0] - 2026-11-04
 
 ### Added

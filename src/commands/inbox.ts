@@ -38,8 +38,9 @@ export function registerInbox(program: Command): void {
       const conv = await restGet<unknown[]>(
         `crm_conversations?id=eq.${conversationId}&select=*,crm_contacts(display_name,company,primary_email,primary_linkedin_url)`,
       );
-      const messages = await restGet<{ sent_at?: string; received_at?: string }[]>(
-        `crm_messages?conversation_id=eq.${conversationId}&select=id,direction,content,sent_at,received_at,sender_external_id,read_at&order=sent_at.desc,received_at.desc&limit=${opts.limit}`,
+      // crm_messages has no sent_at / received_at: created_at is when the message landed either way.
+      const messages = await restGet<{ created_at?: string }[]>(
+        `crm_messages?conversation_id=eq.${conversationId}&select=id,direction,sender_type,content,status,created_at,delivered_at,read_at&order=created_at.desc&limit=${opts.limit}`,
       );
       output({ conversation: conv[0] ?? null, messages: messages.reverse() }, { json: opts.json });
     });
