@@ -75,6 +75,9 @@ aca campaign leads <campaignId> --stuck --json | jq '.[] | .contact_id'
 | `aca inbox show <id>` | Show a conversation and its recent messages. |
 | `aca inbox list` | List all conversations. Filters: `--channel`, `--status`, `--intent`. |
 | `aca reply <id> -m "..."` | Reply to a conversation. Also accepts piped stdin. |
+| `aca reply <id> -m "..." --at "2026-12-07 09:00"` | Schedule the reply instead of sending now (local time, or ISO with an offset). Cancelled automatically if the contact replies first; add `--keep-on-reply` to send regardless. |
+| `aca scheduled ls` | Pending scheduled replies. `-c <conversationId>` for one thread, `--all` to include sent/cancelled/failed. |
+| `aca scheduled cancel <id>` / `aca scheduled reschedule <id> --at "..."` | Cancel or move a pending scheduled reply. |
 
 ### Campaigns
 | Command | What it does |

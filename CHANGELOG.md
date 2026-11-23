@@ -2,6 +2,12 @@
 
 All notable changes to `aca-cli` are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.9.0] - 2026-11-23
+
+### Added
+- **Scheduled replies.** `aca reply <id> --at "2026-12-07 09:00"` queues the reply instead of sending it. It goes out at that time from the same mailbox and thread, with the signature, exactly like a reply sent now. It's cancelled automatically if the contact replies first; `--keep-on-reply` sends it regardless. `--at` takes local time (`YYYY-MM-DD HH:MM`) or an ISO timestamp with an offset.
+- **`aca scheduled`**: `ls` (pending by default; `-c <conversationId>`, `--all`), `cancel <id>` and `reschedule <id> --at "..."`.
+
 ## [0.8.1] - 2026-11-09
 
 ### Fixed

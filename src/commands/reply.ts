@@ -24,6 +24,8 @@ export function registerReply(program: Command): void {
     .option('--subject <text>', 'Email subject (email channels only)')
     .option('--cc <emails>', 'Comma-separated CC list (email only)')
     .option('--bcc <emails>', 'Comma-separated BCC list (email only)')
+    .option('--at <datetime>', 'Schedule instead of sending now, e.g. "2026-12-07 09:00" (local time) or an ISO timestamp with offset')
+    .option('--keep-on-reply', 'With --at: still send even if the contact replies first (default: cancel on reply)')
     .option('--json', 'Emit JSON')
     .action(
       async (
@@ -34,9 +36,18 @@ export function registerReply(program: Command): void {
           subject?: string;
           cc?: string;
           bcc?: string;
+          at?: string;
+          keepOnReply?: boolean;
           json?: boolean;
         },
       ) => {
+        if (opts.keepOnReply && !opts.at) fail('--keep-on-reply only applies with --at');
+        let sendAt: Date | null = null;
+        if (opts.at) {
+          sendAt = parseSendAt(opts.at);
+          if (sendAt.getTime() <= Date.now()) fail(`--at is in the past: ${sendAt.toString()}`);
+        }
+
         const piped = await readStdinIfPiped();
         const content = opts.message ?? piped;
         if (!content) fail('Provide --message "..." or pipe text via stdin');
@@ -70,8 +81,21 @@ export function registerReply(program: Command): void {
           if (opts.bcc) body.email_bcc = opts.bcc.split(',').map((s) => s.trim());
         }
 
+        if (sendAt) {
+          body.send_at = sendAt.toISOString();
+          body.cancel_on_reply = !opts.keepOnReply;
+        }
+
         const result = await invokeFn('crm-send-message', body);
         output(result, { json: opts.json });
       },
     );
+}
+
+/** "2026-12-07 09:00" / "2026-12-07T09:00" = local time; anything with an offset or Z is honoured. */
+export function parseSendAt(value: string): Date {
+  const normalized = value.trim().replace(' ', 'T');
+  const d = new Date(normalized);
+  if (Number.isNaN(d.getTime())) fail(`Can't parse --at "${value}". Use "YYYY-MM-DD HH:MM" or an ISO timestamp.`);
+  return d;
 }
